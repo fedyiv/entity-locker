@@ -5,7 +5,7 @@ The task is to create a reusable utility class that provides synchronization mec
 
 The class is supposed to be used by the components that are responsible for managing storage and caching of different type of entities in the application. EntityLocker itself does not deal with the entities, only with the IDs (primary keys) of the entities.
 
-##Requirements:
+## Requirements:
 
 1. EntityLocker should support different types of entity IDs.
 
@@ -16,7 +16,7 @@ The class is supposed to be used by the components that are responsible for mana
 4. EntityLocker should allow concurrent execution of protected code on different entities.
 
 
-##Completed Optional requirements:
+## Completed Optional requirements:
 
 1. Allow reentrant locking.
 
@@ -24,13 +24,13 @@ The class is supposed to be used by the components that are responsible for mana
 
 3. Implement protection from deadlocks (but not taking into account possible locks outside EntityLocker).
 
-##Incompleted Optional Requirements
+## Incompleted Optional Requirements
 
 4. Implement global lock. Protected code that executes under a global lock must not execute concurrently with any other protected code.
 
 5. Implement lock escalation. If a single thread has locked too many entities, escalate its lock to be a global lock.
 
-##TODO:
+## TODO:
 - Create java doc where it seems to be reasonable
 - review and unify all tests
 - ensure each test is logical and clear
