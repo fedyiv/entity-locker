@@ -30,11 +30,11 @@ public class EntityLockerReentranceTest {
     }
 
 
-    public class ReentrantTask<T> implements Runnable {
+    private static class ReentrantTask<T> implements Runnable {
 
-        private T entityId;
-        private AtomicInteger successCounter;
-        private EntityLocker<T> entityLocker;
+        private final  T entityId;
+        private final  AtomicInteger successCounter;
+        private final  EntityLocker<T> entityLocker;
 
         public ReentrantTask(T entityId, EntityLocker<T> entityLocker, AtomicInteger successCounter) {
             this.entityId = entityId;
@@ -48,9 +48,7 @@ public class EntityLockerReentranceTest {
 
 
             try {
-                entityLocker.tryLockAndExecute(entityId, () -> {
-                    successCounter.incrementAndGet();
-                }, 200);
+                entityLocker.tryLockAndExecute(entityId, successCounter::incrementAndGet, 200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

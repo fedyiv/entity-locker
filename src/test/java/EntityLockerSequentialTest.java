@@ -36,7 +36,7 @@ public class EntityLockerSequentialTest {
 
     }
 
-    private class TestTask<T> implements Runnable {
+    private static class TestTask<T> implements Runnable {
 
         final T entityId;
         final CountDownLatch testSynchronizationLatch;
@@ -68,11 +68,11 @@ public class EntityLockerSequentialTest {
         }
     }
 
-    public class ProtectedCodeTaskForSequentialExecution<T> implements Runnable {
+    private static class ProtectedCodeTaskForSequentialExecution<T> implements Runnable {
 
-        private T entityId;
-        private Semaphore semaphore;
-        private AtomicInteger successCounter;
+        private final T entityId;
+        private final Semaphore semaphore;
+        private final AtomicInteger successCounter;
 
         public ProtectedCodeTaskForSequentialExecution(T entityId, Semaphore semaphore, AtomicInteger successCounter) {
             this.entityId = entityId;

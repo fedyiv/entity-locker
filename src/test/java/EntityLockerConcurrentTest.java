@@ -35,7 +35,7 @@ public class EntityLockerConcurrentTest {
 
     }
 
-    private class TestTask<T> implements Runnable {
+    private static class TestTask<T> implements Runnable {
 
         final T entityId;
         final CountDownLatch testSynchronizationLatch;
@@ -67,11 +67,11 @@ public class EntityLockerConcurrentTest {
         }
     }
 
-    public class ProtectedCodeTaskForConcurrentExecution<T> implements Runnable {
+    private static class ProtectedCodeTaskForConcurrentExecution<T> implements Runnable {
 
-        private T entityId;
-        private CountDownLatch latch;
-        private AtomicInteger successCounter;
+        final private T entityId;
+        final private CountDownLatch latch;
+        final private AtomicInteger successCounter;
 
         public ProtectedCodeTaskForConcurrentExecution(T entityId, CountDownLatch latch, AtomicInteger successCounter) {
             this.entityId = entityId;

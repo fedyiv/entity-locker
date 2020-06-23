@@ -3,16 +3,14 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class EntityLockerDeadlockPreventionTest {
 
     @Test
-    public void testDeadlockPreventionWithTwoThreadsAndTwoEntities() throws InterruptedException {
+    public void testDeadlockPreventionWithTwoThreadsAndTwoEntities() {
 
 
         Integer entityId1 = 1;
@@ -37,18 +35,19 @@ public class EntityLockerDeadlockPreventionTest {
             t2.start();
 
 
-            Assertions.assertTimeoutPreemptively(Duration.ofSeconds((long) (singleThreadWorkTimeMs / 1000 * 2) + 1), () -> {
+            Assertions.assertTimeoutPreemptively(Duration.ofSeconds((singleThreadWorkTimeMs / 1000 * 2) + 1), () -> {
                 t1.join();
                 t2.join();
             });
         }
 
-        Assertions.assertEquals(true, deadlockPrevented.get());
+        //If this condition fails it might mean that deadlock condition simply did not occur
+        Assertions.assertTrue(deadlockPrevented.get());
 
     }
 
     @Test
-    public void testDeadlockPreventionWithThreeThreadsAndThreeEntities() throws InterruptedException {
+    public void testDeadlockPreventionWithThreeThreadsAndThreeEntities() {
 
 
         Integer entityId1 = 1;
@@ -77,25 +76,26 @@ public class EntityLockerDeadlockPreventionTest {
             t3.start();
 
 
-            Assertions.assertTimeoutPreemptively(Duration.ofSeconds((long) (singleThreadWorkTimeMs / 1000 * 3) + 1), () -> {
+            Assertions.assertTimeoutPreemptively(Duration.ofSeconds((singleThreadWorkTimeMs / 1000 * 3) + 1), () -> {
                 t1.join();
                 t2.join();
                 t3.join();
             });
         }
 
-        Assertions.assertEquals(true, deadlockPrevented.get());
+        //If this condition fails it might mean that deadlock condition simply did not occur
+        Assertions.assertTrue(deadlockPrevented.get());
 
     }
 
     @Test
-    public void testDeadlockPreventionWithMultipleThreadsAndTwoEntities() throws InterruptedException {
+    public void testDeadlockPreventionWithMultipleThreadsAndTwoEntities() {
 
 
         Integer entityId1 = 1;
         Integer entityId2 = 2;
         final long singleThreadWorkTimeMs = 1000;
-        final int numberOfThreads=20;
+        final int numberOfThreads = 20;
 
         final EntityLocker<Integer> entityLocker = new EntityLocker<>();
         final AtomicBoolean deadlockPrevented = new AtomicBoolean();
@@ -105,7 +105,7 @@ public class EntityLockerDeadlockPreventionTest {
 
         List<Thread> threads = new ArrayList<>();
 
-        for (int i = 0; i < numberOfThreads/2; i++) {
+        for (int i = 0; i < numberOfThreads / 2; i++) {
 
             Thread t1 = new Thread(new TestTask<>(entityId1, entityId2, latch, entityLocker, deadlockPrevented, singleThreadWorkTimeMs));
             Thread t2 = new Thread(new TestTask<>(entityId2, entityId1, latch, entityLocker, deadlockPrevented, singleThreadWorkTimeMs));
@@ -121,16 +121,16 @@ public class EntityLockerDeadlockPreventionTest {
 
         }
 
-        Assertions.assertTimeoutPreemptively(Duration.ofSeconds((long) (singleThreadWorkTimeMs / 1000 * 2*numberOfThreads) + 1), () -> {
-            for(Thread t:threads)
+        Assertions.assertTimeoutPreemptively(Duration.ofSeconds(((long) 2 * numberOfThreads) + 1), () -> {
+            for (Thread t : threads)
                 t.join();
         });
 
-        Assertions.assertEquals(true, deadlockPrevented.get());
+        Assertions.assertTrue(deadlockPrevented.get());
 
     }
 
-    private class TestTask<T> implements Runnable {
+    private static class TestTask<T> implements Runnable {
 
         private final T entityId1;
         private final T entityId2;
@@ -164,11 +164,11 @@ public class EntityLockerDeadlockPreventionTest {
         }
     }
 
-    public class DeadlockProneTask<T> implements Runnable {
+    private static class DeadlockProneTask<T> implements Runnable {
 
-        private T entityId;
-        private EntityLocker<T> entityLocker;
-        private AtomicBoolean deadlockPrevented;
+        private final T entityId;
+        private final EntityLocker<T> entityLocker;
+        private final AtomicBoolean deadlockPrevented;
         private final long singleThreadWorkTimeMs;
 
         public DeadlockProneTask(T entityId, EntityLocker<T> entityLocker, AtomicBoolean deadlockPrevented, long singleThreadWorkTimeMs) {
@@ -185,7 +185,7 @@ public class EntityLockerDeadlockPreventionTest {
 
                 entityLocker.lockAndExecute(entityId, () -> {
                     try {
-                        System.out.println("Starting inner task for entityId = " + entityId);
+                        System.out.println("Starting inner task for entityId = " + entityId + "and threadId = " + Thread.currentThread().getId());
                         Thread.sleep(singleThreadWorkTimeMs);
                     } catch (InterruptedException e) {
                         e.printStackTrace();

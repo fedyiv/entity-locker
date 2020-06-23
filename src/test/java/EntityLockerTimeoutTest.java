@@ -57,9 +57,9 @@ public class EntityLockerTimeoutTest {
 
     }
 
-    public class ProtectedCodeTaskForTimingOut<T> implements Runnable {
-        private T entityId;
-        private long timeoutInMilliseconds;
+    private static class ProtectedCodeTaskForTimingOut<T> implements Runnable {
+        private final T entityId;
+        private final long timeoutInMilliseconds;
 
         public ProtectedCodeTaskForTimingOut(T entityId, long timeoutInMilliseconds) {
             this.entityId = entityId;
